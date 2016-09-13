@@ -78,6 +78,25 @@ def download_bookmarks_html(opener, username, date):
     return opener.open(url).read()
 
 
+def download_bookmarks_html(opener, from_idx, to_idx):
+    url_format = 'https://my.xmarks.com/bookmarks/view/{page_number}/'
+
+    for x in range(from_idx, to_idx + 1):
+        url = url_format.format(page_number=x)
+        print('Downloading from: ' + url)
+        resp = opener.open(url)
+        content = resp.read()
+
+        if content:
+            filename = 'export_' + str(x) + '.html'
+            print('Writing content to: ' + filename)
+            f = open(filename, 'wb')
+            f.write(content)
+            f.close()
+        else:
+            print('CONTENT WAS EMPTY FOR URL: ' + url)
+
+
 def logout(opener):
     """Logout from Xmarks.
 
@@ -98,9 +117,16 @@ def main():
 
     password = getpass.getpass()
 
+    # /////ORIGINAL
+    # opener = login(args.username, password)
+    # today = datetime.date.today()
+    # bookmarks_html = download_bookmarks_html(opener, args.username, today)
+    # ------
+    from_idx = 3
+    to_idx = 623
     opener = login(args.username, password)
-    today = datetime.date.today()
-    bookmarks_html = download_bookmarks_html(opener, args.username, today)
+    bookmarks_html = download_bookmarks_html(opener, from_idx, to_idx)
+
     logout(opener)
 
     print '%s' % (bookmarks_html,)
